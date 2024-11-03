@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    volumes:
+      - ./docs:/app/docs
+      - ./data:/app/data
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+    stdin_open: true  # Keep STDIN open
+    tty: true        # Allocate a pseudo-TTY
+    networks:
+      - chrisbot-network
+
+networks:
+  chrisbot-network:
+    driver: bridge

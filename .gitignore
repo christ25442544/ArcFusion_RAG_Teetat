@@ -1,0 +1,9 @@
+myenv
+.env
+.DS_Store
+__pycache__
+LLMres/myenv
+LLMres/__pycache__
+LLMres/.DS_Store
+LLMres/embedding_metadata.json
+FastAPI
