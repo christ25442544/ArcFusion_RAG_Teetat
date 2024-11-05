@@ -59,15 +59,29 @@ class ChatbotService:
 
     def extract_assistant_response(self, full_response: str) -> str:
         """Extract only the final assistant response from the full conversation."""
-        # Split by 'Assistant:' and take the last part
-        parts = full_response.split('Assistant:')
-        if parts:
-            final_response = parts[-1].strip()
-            # Remove any 'You:' or question part that might be at the start
-            if 'You:' in final_response:
-                final_response = final_response.split('You:')[-1].strip()
-            return final_response
-        return full_response
+        try:
+            # First, try to split by 'Assistant:' and get the last part
+            parts = full_response.split('Assistant:')
+            if len(parts) > 1:
+                final_response = parts[-1].strip()
+                
+                # Remove any 'You:' or user message that might be included
+                if 'You:' in final_response:
+                    final_response = final_response.split('You:')[0].strip()
+                
+                # Remove any repeated text at the start
+                if final_response.startswith(final_response[:20]) and len(final_response) > 40:
+                    unique_part = final_response[len(final_response)//2:].strip()
+                    return unique_part
+                
+                return final_response
+            
+            # If no 'Assistant:' found, return the cleaned original response
+            return full_response.strip()
+            
+        except Exception as e:
+            logger.error(f"Error cleaning response: {str(e)}")
+            return full_response.strip()
 
     async def get_response(self, user_id: str, message: str) -> str:
         if not self.initialized:
@@ -90,6 +104,11 @@ class ChatbotService:
             
             # Extract only the final assistant response
             clean_response = self.extract_assistant_response(full_response)
+            
+            # Add logging to debug response cleaning
+            logger.debug(f"Original response: {full_response}")
+            logger.debug(f"Cleaned response: {clean_response}")
+            
             return clean_response
             
         except Exception as e:

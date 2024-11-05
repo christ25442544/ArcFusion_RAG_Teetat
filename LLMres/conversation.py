@@ -85,7 +85,6 @@ class ConversationalAgent:
     async def stream_response(self, thread_id: str, query: str):
         if await self.detect_clear_intent(query):
             if self.clear_conversation(thread_id):
-                print("Chat history cleared successfully")
                 return "Memory cleared. Starting a new conversation."
             return "No conversation history found to clear."
         
@@ -96,7 +95,7 @@ class ConversationalAgent:
         messages = self.prepare_messages(conversation, query)
         config = {"configurable": {"thread_id": thread_id}}
         
-        response_content = []
+        final_response = ""
         for event in self.agent.stream(
             {"messages": messages},
             config=config,
@@ -104,11 +103,12 @@ class ConversationalAgent:
         ):
             if "messages" in event and event["messages"]:
                 last_message = event["messages"][-1]
-                print(f"Assistant: {last_message.content}")
-                response_content.append(last_message.content)
+                final_response = last_message.content
         
-        full_response = " ".join(response_content)
+        # Store the conversation history
         conversation.add_message("human", query)
-        conversation.add_message("assistant", full_response)
+        conversation.add_message("assistant", final_response)
         
-        return full_response
+        # Return only the final response
+        return final_response
+        
