@@ -96,13 +96,24 @@ class RetrievalSystem:
             tool = create_retriever_tool(
                 retriever,
                 "document_retriever",
-                "Searches the database for information about Chris (Teetat Karuhawanit). Always use this tool first before answering any question."
+                """Searches the database for information about Chris (Teetat Karuhawanit). 
+            Use this tool when:
+            1. The question is specifically about Chris's background, experience, or skills
+            2. You need specific details about Chris's work or education
+            3. You need to verify facts about Chris
+            
+            Do NOT use this tool for:
+            1. General greetings or casual conversation
+            2. Simple questions that don't require personal information
+            3. Questions unrelated to Chris's background or experience
+            """
             )
             
             self.agent = create_react_agent(
                 llm,
                 [tool],
                 checkpointer=self.memory,
+                
             )
             
             self.conv_agent = ConversationalAgent(self.agent)
