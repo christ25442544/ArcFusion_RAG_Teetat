@@ -141,6 +141,12 @@ async def receive_webhook(request: Request):
                 reply_token = event["replyToken"]
                 user_id = event["source"]["userId"]
                 
+                #Animation
+                loading_success = start_loading_animation(user_id)
+                if not loading_success:
+                    logger.warning("Failed to start loading animation")
+
+
                 # Get response from chatbot
                 bot_reply = await chatbot_service.get_response(user_id, user_message)
                 
@@ -173,6 +179,20 @@ def send_line_message(reply_token: str, message: str):
     if response.status_code != 200:
         logger.error(f"Error sending LINE message: {response.status_code} {response.text}")
     return response.json()
+
+def start_loading_animation(chat_id: str, seconds: int = 10):
+    """Start loading animation for LINE chat."""
+    url = "https://api.line.me/v2/bot/chat/loading/start"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {os.getenv('LINE_CHANNEL_ACCESS_TOKEN')}"
+    }
+    data = {
+        "chatId": chat_id,
+        "loadingSeconds": seconds
+    }
+    requests.post(url, headers=headers, json=data)
+       
 
 # Add health check endpoints
 @app.get("/health")
