@@ -16,7 +16,7 @@ class Conversation:
     def add_message(self, role: str, content: str):
         self.messages.append({"role": role, "content": content})
     
-    def get_context(self, last_n: int = 3) -> List[Dict[str, Any]]:
+    def get_context(self, last_n: int = 5) -> List[Dict[str, Any]]:
         return self.messages[-last_n:] if len(self.messages) > 0 else []
     
     def clear_history(self):

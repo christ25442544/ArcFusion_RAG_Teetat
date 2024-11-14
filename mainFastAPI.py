@@ -180,7 +180,7 @@ def send_line_message(reply_token: str, message: str):
         logger.error(f"Error sending LINE message: {response.status_code} {response.text}")
     return response.json()
 
-def start_loading_animation(chat_id: str, seconds: int = 10):
+def start_loading_animation(chat_id: str, seconds: int = 15):
     """Start loading animation for LINE chat."""
     url = "https://api.line.me/v2/bot/chat/loading/start"
     headers = {
